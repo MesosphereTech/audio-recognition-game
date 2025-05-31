@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        .monster {
+            width: 100px;
+            height: 100px;
+            background: #4a4;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: eat 5s infinite;
+        }
+        .mouth {
+            width: 60px;
+            height: 30px;
+            background: #222;
+            border-radius: 0 0 30px 30px;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            animation: chew 1s infinite;
+        }
+        @keyframes eat {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+        @keyframes chew {
+            0%, 100% { height: 30px; }
+            50% { height: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="monster">
+        <div class="mouth"></div>
+    </div>
+</body>
+</html> 

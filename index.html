@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>声临奇境：万物皆可配</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // 添加全局错误处理
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('发生错误:', msg, '\n文件:', url, '\n行:', line, '\n列:', col, '\n错误对象:', error);
+            return false;
+        };
+        // 确保GAME_DATA对象存在
+        window.GAME_DATA = window.GAME_DATA || {};
+    </script>
+    <script src="data.js"></script>
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+    <script src="levels.js"></script>
+    <script src="menu.js"></script>
+    <script src="app.js"></script>
+    <script src="assets/audio/samples/metal_sample.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white overflow-hidden select-none fixed inset-0">
+    <div id="app" class="w-full h-full relative font-wild">
+
+        <!-- Main Menu Scene -->
+        <div id="main-menu" class="scene active w-full h-full">
+            <div class="retro-bg main-menu-bg w-full h-full relative">
+                <div class="absolute inset-0 retro-grid-pattern opacity-30"></div>
+                <div class="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-8">
+                    <div class="text-center mb-10 sm:mb-12">
+                        <div class="game-logo-placeholder mx-auto mb-2 retro-logo-glitch">
+                            <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" class="w-64 sm:w-80 h-auto">
+                                <defs>
+                                    <filter id="neon-glow-pink" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <style>
+                                    .logo-text { font-family: 'Orbitron', sans-serif; font-size: 28px; fill: var(--retro-yellow); stroke: var(--retro-pink); stroke-width: 0.7; letter-spacing: 1px; text-anchor: middle; }
+                                    .logo-text-shadow { filter: url(#neon-glow-pink); }
+                                </style>
+                                <g class="logo-text-shadow">
+                                   <text x="100" y="40" class="logo-text">声临奇境</text>
+                                </g>
+                            </svg>
+                        </div>
+                        <p class="retro-subtitle text-xl sm:text-2xl text-yellow-300 retro-text-shadow-heavy">
+                            万物皆可配音!
+                        </p>
+                        <div class="retro-scan-line-divider mt-3 sm:mt-4"></div>
+                    </div>
+
+                    <div class="space-y-4 sm:space-y-5 w-full max-w-xs sm:max-w-sm md:max-w-md">
+                        <button id="start-game-btn" class="retro-button primary w-full">
+                            <span class="retro-button-text">开始躁动!</span>
+                        </button>
+                        <button id="warehouse-btn" class="retro-button secondary w-full">
+                            <span class="retro-button-text">怪奇仓库</span>
+                        </button>
+                        <button id="shop-btn" class="retro-button secondary w-full">
+                            <span class="retro-button-text">声纳超市</span>
+                         </button>
+                         <button id="watch-ad-main-menu-btn" class="retro-button secondary w-full">
+                            <span class="retro-button-text">🎬 看广告拿灵感</span>
+                        </button>
+                        <button id="settings-btn" class="retro-button secondary w-full">
+                            <span class="retro-button-text">调校参数</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Selection Scene -->
+        <div id="level-select" class="scene w-full h-full">
+            <div class="retro-bg level-select-bg w-full h-full relative">
+                 <div class="absolute inset-0 retro-grid-pattern opacity-20"></div>
+                <header class="fixed-header top-0 left-0 right-0 z-20 p-4 sm:p-5">
+                    <div class="flex items-center justify-between">
+                        <button id="back-to-menu" class="retro-back-button">
+                            <span class="retro-button-text"><span class="text-2xl leading-none">&laquo;</span> 主菜单</span>
+                        </button>
+                        <h2 class="retro-heading text-xl sm:text-2xl">选择关卡</h2>
+                         <div class="flex items-center text-yellow-300 text-base sm:text-lg retro-text-shadow global-score-display">灵感: 0</div>
+                    </div>
+                </header>
+
+                <main class="pt-24 pb-24 px-4 sm:px-6 h-full overflow-y-auto">
+                    <div id="level-map" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 content-start max-w-6xl mx-auto">
+                        {/* Level cards populated by JS */}
+                    </div>
+                </main>
+
+                <footer id="room-info" class="fixed-footer bottom-0 left-0 right-0 retro-panel p-3 sm:p-4 text-center hidden">
+                    <h3 class="text-base sm:text-lg font-bold mb-1 text-yellow-300">阁楼录音间</h3>
+                    <p class="text-xs sm:text-sm text-gray-300">在这充满旧物的神秘阁楼中开始你的配音之旅...</p>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Game Scene -->
+        <div id="game-scene" class="scene w-full h-full">
+            <div class="retro-bg game-scene-bg w-full h-full relative">
+                <div class="absolute inset-0 retro-grid-pattern opacity-10"></div>
+                <header class="fixed-header top-0 left-0 right-0 z-20 p-3 sm:p-4">
+                    <div class="flex items-center justify-between">
+                        <button id="back-to-levels" class="retro-back-button">
+                             <span class="retro-button-text"><span class="text-2xl leading-none">&laquo;</span> 选关</span>
+                        </button>
+                        <div class="text-center flex-1 mx-2">
+                            <div id="level-title" class="retro-heading text-base sm:text-lg truncate" title="关卡名称">加载中...</div>
+                            <div id="score-display" class="text-xs sm:text-sm text-yellow-400 mt-0.5 global-score-display">总分: 0</div>
+                        </div>
+                         <button id="preview-btn" class="retro-control-button small" disabled title="预览关卡视频">
+                            <span class="retro-button-text">预览</span>
+                        </button>
+                    </div>
+                </header>
+
+                <main class="pt-20 pb-16 px-2 sm:px-4 h-full overflow-y-auto">
+                    <div class="max-w-3xl mx-auto h-full flex flex-col">
+                        <section id="video-area" class="flex-1 mb-2 sm:mb-3 flex items-stretch justify-center relative aspect-video">
+                            <div id="video-placeholder" class="retro-video-frame w-full absolute inset-0 z-10">
+                                <div class="video-placeholder-content w-full h-full flex flex-col items-center justify-center text-center p-2 sm:p-4 overflow-y-auto">
+                                     {/* Content set by JS: showVideoPlaceholder */}
+                                </div>
+                            </div>
+                            <video id="level-video" class="w-full h-full object-contain hidden" playsinline webkit-playsinline muted loop autoplay></video>
+                        </section>
+                         <section id="timeline-section" class="mb-2 sm:mb-3">
+                            <div id="timeline-container" class="relative p-1">
+                                <div class="retro-timeline">
+                                    <div id="timeline-progress" class="retro-timeline-progress"></div>
+                                    <canvas id="audio-waveform-canvas" class="retro-waveform-canvas"></canvas>
+                                     <div id="timeline-cue-points" class="absolute inset-y-0 left-0 right-0 pointer-events-none">
+                                         {/* Cue point markers populated by JS */}
+                                     </div>
+                                </div>
+                                <div class="flex justify-between text-xs mt-1 px-1 text-gray-400">
+                                    <span id="current-time">0:00</span>
+                                    <span id="total-time">0:00</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="controls-panel" class="retro-panel p-2 sm:p-3 md:p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3">
+                                <div class="retro-section flex flex-col items-center p-2 sm:p-2.5">
+                                    <h3 class="retro-section-title mb-1.5 sm:mb-2">录音控制</h3>
+                                    <div class="space-y-1.5 sm:space-y-2 w-full">
+                                        <button id="record-btn" class="retro-record-button w-full" disabled title="开始或停止录音">
+                                            <span class="retro-button-text" id="record-text">开始狂嚎!</span>
+                                            <div class="retro-record-indicator"></div>
+                                        </button>
+                                        <button id="playback-btn" class="retro-control-button w-full" disabled title="试听您的录音"><span class="retro-button-text">试听回放</span></button>
+                                    </div>
+                                    <div class="mt-1.5 sm:mt-2 w-full">
+                                        <div class="text-xs mb-0.5 text-center text-gray-400">实时音量</div>
+                                        <div class="retro-audio-meter"><div id="audio-level-fill" class="retro-audio-level-fill"></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="retro-section flex flex-col items-center p-2 sm:p-2.5">
+                                    <h3 class="retro-section-title mb-1.5 sm:mb-2">选择物品</h3>
+                                    <div id="item-slots" class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 w-full justify-center">
+                                        {/* Item slots populated by JS */}
+                                    </div>
+                                    <p class="text-xs text-gray-400 text-center leading-tight">
+                                        已选 <span id="selected-item-count">0</span> /
+                                        最多 <span id="max-items-label">3</span> 个
+                                     </p>
+                                </div>
+
+                                <div class="retro-section flex flex-col items-center p-2 sm:p-2.5">
+                                    <h3 class="retro-section-title mb-1.5 sm:mb-2">即时评分</h3>
+                                    <div id="score-breakdown" class="space-y-0.5 sm:space-y-1 text-xs w-full mb-1.5 sm:mb-2 text-center">
+                                        <div>时机: <span id="timing-score">--</span></div>
+                                        <div>表现: <span id="performance-score">--</span></div>
+                                        <div>创意: <span id="creativity-score">--</span></div>
+                                    </div>
+                                    <button id="submit-btn" class="retro-submit-button w-full" disabled title="提交您的配音作品进行评分"><span class="retro-button-text">提交大作</span></button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+                 <div class="fixed bottom-2 left-1/2 transform -translate-x-1/2 w-11/12 max-w-md z-10 pointer-events-none">
+                    <div class="h-10 bg-black/70 border border-dashed border-gray-700/80 flex items-center justify-center text-gray-600 text-xs rounded-lg shadow-lg backdrop-blur-sm">
+                        模拟横幅广告位 (游戏中)
+                    </div>
+                 </div>
+            </div>
+        </div>
+        
+        <!-- Objective Modal -->
+        <div id="objective-modal" class="fixed inset-0 bg-black bg-opacity-85 z-50 hidden items-center justify-center p-4 scene">
+            <div class="retro-modal max-w-md w-full">
+                <div class="retro-modal-header">
+                    <h2 id="objective-modal-title" class="text-xl sm:text-2xl font-bold">关卡目标</h2>
+                    {/* No close button, must start or will be hidden by game logic */}
+                </div>
+                <div id="objective-modal-content" class="retro-modal-body text-left">
+                    {/* Content set by JS */}
+                </div>
+                 <div class="retro-modal-footer">
+                    <button id="objective-modal-start-btn" class="retro-button primary w-full"><span class="retro-button-text">我准备好了! 开始配音!</span></button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-85 z-50 hidden items-center justify-center p-4 scene">
+            <div class="retro-modal max-w-md w-full">
+                <div class="retro-modal-header">
+                    <h2 class="text-xl sm:text-2xl font-bold">配音完成!</h2>
+                    <button class="score-modal-close-btn" title="关闭">&times;</button>
+                </div>
+                <div class="retro-modal-body text-center">
+                    <div id="final-stars" class="retro-stars text-4xl mb-3 sm:mb-4"></div>
+                    <div id="final-score" class="text-5xl font-bold text-yellow-300 mb-2 retro-text-shadow-heavy">0</div>
+                    <div id="score-comment" class="text-gray-200 text-sm sm:text-base mb-4">继续努力！</div>
+
+                    <div id="shop-effects-feedback" class="text-left text-xs p-2 mb-3 bg-purple-900/30 border border-purple-700 rounded-md hidden">
+                        {/* Shop effects feedback populated by JS */}
+                    </div>
+
+                    <div class="retro-rewards mb-4 sm:mb-6">
+                        <h3 class="font-bold mb-1 text-lg text-green-400">获得奖励:</h3>
+                        <div class="flex items-center justify-center">
+                            <span id="earned-points" class="text-lg text-yellow-300">
+                                +0 <span class="retro-coin-icon ml-1"></span> <span class="text-sm">灵感</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button id="watch-ad-double-reward" class="retro-button secondary w-full py-2 sm:py-3 text-base sm:text-lg mb-3 hidden">
+                        <span class="retro-button-text">🎬 观看广告获取双倍灵感!</span>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <button id="retry-btn" class="retro-button secondary"><span class="retro-button-text">再来亿遍</span></button>
+                        <button id="next-level-btn" class="retro-button primary"><span class="retro-button-text">下一挑战</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="fixed inset-0 bg-gray-950 bg-opacity-95 z-[100] hidden opacity-0 transition-opacity duration-300 ease-in-out flex items-center justify-center">
+            <div class="retro-loader text-center p-8 bg-black/30 rounded-xl shadow-2xl border border-dashed border-retro-cyan/50 backdrop-blur-sm">
+                <div class="retro-loader-spinner mb-4"></div>
+                <div class="text-lg text-cyan-300 retro-text-shadow">加载中... 请稍候</div>
+            </div>
+        </div>
+
+        <div id="generic-modal-overlay" class="fixed inset-0 bg-black bg-opacity-85 z-50 hidden items-center justify-center p-4 scene">
+            <div class="retro-modal max-w-lg w-full">
+                <div class="retro-modal-header">
+                    <h2 id="generic-modal-title" class="text-xl sm:text-2xl font-bold">标题</h2>
+                    <button class="generic-modal-close-btn" title="关闭">&times;</button>
+                </div>
+                <div id="generic-modal-body" class="retro-modal-body">
+                    {/* Content here */}
+                </div>
+                 <div class="retro-modal-footer">
+                    <button class="retro-button secondary generic-modal-action-close-btn"><span class="retro-button-text">关闭</span></button>
+                </div>
+            </div>
+        </div>
+         {/* Notifications will be appended to body by JS */}
+    </div>
+</body>
+</html>
