@@ -167,6 +167,15 @@ class RetroVoiceGameApp {
                 }
                 this.audio.playBackgroundSound('game');
                 break;
+            case 'matching-game-scene':
+                if (!this.matchingGame) {
+                    this.matchingGame = new AudioMatchingGame(this);
+                }
+                if (options.levelData) {
+                    this.matchingGame.loadLevel(options.levelData);
+                }
+                this.audio.playBackgroundSound('game');
+                break;
             case 'shop': // If shop becomes its own scene, or for shop BGM in modal
                  this.audio.playBackgroundSound('shop');
                  break;
@@ -384,6 +393,11 @@ class RetroVoiceGameApp {
             }
         }
         // No sound for 'info' by default, or could add a neutral 'info_ping'
+    }
+
+    // Alias for showScene - used by matching game
+    switchToScene(sceneName, options = {}) {
+        this.showScene(sceneName, options);
     }
 }
 

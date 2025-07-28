@@ -19,6 +19,10 @@ class LevelManager {
         }
         levelMapContainer.innerHTML = ''; // Clear previous cards
 
+        // Add Audio Matching Game Mode card
+        const matchingGameCard = this.createMatchingGameCard();
+        levelMapContainer.appendChild(matchingGameCard);
+
         this.levelsData.forEach((level, index) => {
             const levelCard = this.createLevelCard(level, index);
             levelMapContainer.appendChild(levelCard);
@@ -60,6 +64,66 @@ class LevelManager {
             card.title = `未解锁: ${unlockReqText}`;
         }
         return card;
+    }
+
+    createMatchingGameCard() {
+        const card = document.createElement('div');
+        card.className = 'retro-level-card special-mode';
+        card.style.background = 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)';
+        card.style.borderColor = '#8b5cf6';
+        card.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
+
+        card.innerHTML = `
+            <div class="retro-level-number">🎵</div>
+            <div class="retro-level-title">音频匹配模式</div>
+            <div class="retro-level-description">实时拖拽匹配音轨</div>
+            <div class="retro-level-actions">
+                <button class="retro-button primary small">开始游戏</button>
+            </div>
+            <div class="special-mode-badge">新模式</div>
+        `;
+
+        // Add click handler
+        const startButton = card.querySelector('button');
+        startButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.startMatchingGame();
+        });
+
+        card.addEventListener('click', () => {
+            this.startMatchingGame();
+        });
+
+        return card;
+    }
+
+    startMatchingGame() {
+        console.log('🎮 启动音频匹配游戏模式');
+        
+        // Sample level data for matching game
+        const sampleLevelData = {
+            title: '音频匹配挑战',
+            videoUrl: 'assets/video/Video_scene_10_202505251512.mp4', // Use existing video
+            audioTracks: [
+                { id: 1, startTime: 2, duration: 3, soundType: 'metal', label: '金属碰撞声' },
+                { id: 2, startTime: 6, duration: 2, soundType: 'water', label: '水流声' },
+                { id: 3, startTime: 10, duration: 4, soundType: 'wood', label: '木头敲击' },
+                { id: 4, startTime: 15, duration: 2, soundType: 'paper', label: '纸张翻动' },
+                { id: 5, startTime: 18, duration: 3, soundType: 'fabric', label: '布料摩擦' }
+            ]
+        };
+
+        // Play transition sound
+        if (this.app.audio) {
+            this.app.audio.playSFX('transition');
+        }
+
+        // Switch to matching game scene
+        this.app.showScene('matching-game-scene', { 
+            levelData: sampleLevelData,
+            showLoading: true,
+            loadingDuration: 1000
+        });
     }
 
     renderStarsHTML(starCount) {

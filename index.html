@@ -20,6 +20,7 @@
     <script src="game.js"></script>
     <script src="levels.js"></script>
     <script src="menu.js"></script>
+    <script src="matching-game.js"></script>
     <script src="app.js"></script>
     <script src="assets/audio/samples/metal_sample.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>">
@@ -202,8 +203,98 @@
                     </div>
                  </div>
             </div>
+                </div>
+
+        <!-- Audio Matching Game Scene -->
+        <div id="matching-game-scene" class="scene w-full h-full hidden">
+            <div class="retro-bg game-scene-bg w-full h-full relative">
+                <div class="absolute inset-0 retro-grid-pattern opacity-10"></div>
+                
+                <!-- Header -->
+                <header class="fixed-header top-0 left-0 right-0 z-20 p-3 sm:p-4">
+                    <div class="flex items-center justify-between">
+                        <button id="matching-back-to-levels" class="retro-back-button">
+                             <span class="retro-button-text"><span class="text-2xl leading-none">&laquo;</span> 选关</span>
+                        </button>
+                        <div class="text-center flex-1 mx-2">
+                            <div id="matching-level-title" class="retro-heading text-base sm:text-lg truncate" title="关卡名称">音频匹配模式</div>
+                            <div id="matching-score-display" class="text-xs sm:text-sm text-yellow-400 mt-0.5 global-score-display">得分: 0</div>
+                        </div>
+                         <button id="matching-pause-btn" class="retro-control-button small" title="暂停游戏">
+                            <span class="retro-button-text">暂停</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Main Game Area -->
+                <main class="pt-20 pb-4 px-2 sm:px-4 h-full overflow-hidden">
+                    <div class="w-full h-full flex gap-2 sm:gap-4">
+                        
+                        <!-- Left Side: Video Player -->
+                        <div class="w-1/3 h-full flex flex-col">
+                            <div class="flex-1 bg-black rounded-lg overflow-hidden border-2 border-cyan-500/30">
+                                <video id="matching-video" class="w-full h-full object-contain" playsinline webkit-playsinline muted></video>
+                                <div id="matching-video-overlay" class="w-full h-full flex items-center justify-center bg-gray-900 text-gray-400">
+                                    点击开始播放视频
+                                </div>
+                            </div>
+                            
+                            <!-- Video Controls -->
+                            <div class="mt-2 flex gap-2">
+                                <button id="matching-play-btn" class="retro-button primary flex-1">
+                                    <span class="retro-button-text">▶ 播放</span>
+                                </button>
+                                <button id="matching-reset-btn" class="retro-button secondary">
+                                    <span class="retro-button-text">↻</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Audio Tracks Timeline -->
+                        <div class="w-2/3 h-full flex flex-col">
+                            <div class="flex-1 bg-black/50 rounded-lg border-2 border-purple-500/30 relative overflow-hidden">
+                                <!-- Timeline Header -->
+                                <div class="absolute top-0 left-0 right-0 h-8 bg-gray-900/80 border-b border-gray-600 flex items-center px-2">
+                                    <div class="text-sm text-cyan-300 font-bold">音轨时间轴</div>
+                                    <div class="ml-auto text-xs text-gray-400">
+                                        <span id="matching-current-time">00:00</span> / <span id="matching-total-time">00:00</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Audio Tracks Container -->
+                                <div id="audio-tracks-container" class="absolute top-8 left-0 right-0 bottom-0 overflow-hidden">
+                                    <!-- Audio tracks will be dynamically created here -->
+                                </div>
+                                
+                                <!-- Timeline Cursor -->
+                                <div id="timeline-cursor" class="absolute top-8 bottom-0 w-0.5 bg-red-500 z-20 left-0"></div>
+                            </div>
+                            
+                            <!-- Timeline Controls -->
+                            <div class="mt-2 flex items-center gap-2">
+                                <div class="text-xs text-gray-400">速度:</div>
+                                <input id="playback-speed" type="range" min="0.5" max="2" step="0.1" value="1" class="flex-1">
+                                <div id="speed-display" class="text-xs text-cyan-300 w-8">1.0x</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Bottom: Item Library -->
+                <footer class="fixed bottom-0 left-0 right-0 h-20 bg-gray-900/95 border-t-2 border-cyan-500/30 backdrop-blur-sm">
+                    <div class="h-full px-4 flex items-center gap-2">
+                        <div class="text-sm text-cyan-300 font-bold mr-4">物件库:</div>
+                        <div id="item-library" class="flex-1 flex gap-2 overflow-x-auto">
+                            <!-- Draggable items will be populated here -->
+                        </div>
+                        <div class="text-xs text-gray-400 ml-4">
+                            连击: <span id="combo-counter" class="text-yellow-300 font-bold">0</span>
+                        </div>
+                    </div>
+                </footer>
+            </div>
         </div>
-        
+
         <!-- Objective Modal -->
         <div id="objective-modal" class="fixed inset-0 bg-black bg-opacity-85 z-50 hidden items-center justify-center p-4 scene">
             <div class="retro-modal max-w-md w-full">
